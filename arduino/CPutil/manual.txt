@@ -1,0 +1,119 @@
+CPE123 Embedded Systems and Robotics - Library code: Button, Led and MSTimer 
+ 
+Overview of the CPE123 library: 
+ 
+1.	Support functions: 
+ 
+	I. 	setupMessage(__FILE__, “Message”); 
+•	Prints sketch filename and compile date on the serial console 
+•	Then prints out whatever you have in message 
+ 	 
+Example: void setup()  
+{ 
+	   // put your setup code here, to run once: 
+	 	Serial.begin(9600); 
+	 	setupMessage(__FILE__, “Start program to test the LED…”);
+} 
+ 
+ 	 
+	II. 	Output multiple items to the serial console: 
+a. print2(a, b);  
+   a.	Prints to the Serial console two different items (e.g. two different variables) 
+ 
+b.	print3(a, b, c); 
+   a. Prints three different items 
+ 
+c. Print4(a, b, c, d); 
+   a. Prints four different items 
+ 
+Example: 
+ 	int x = 10;
+   int y = 20; 
+	print4(“X value is: “, x, “ Y value is: “, y); 
+ 
+ 
+2.	Button 
+•	Creates a software version of the button 
+•	Allows you to check if the button was pushed 
+•	The software will initialize the button pin for you  
+ 
+const int buttonPin = 2; 
+ 
+Button myButton(buttonPin); 	<- creates the software version of a button 
+ 
+Loop() 
+{
+   if (myButton.wasPushed() == true) 
+   { 
+      Serial.println(“button has been pushed”);
+   }
+}
+ 
+Things you can do to a button: 
+ 
+o .wasPushed: Check if the button is pushed but only once per 500 ms (so if you hold the button down you will recognize one button push per 500 ms.) 
+	• 	Use: if (button.wasPushed() == true)… 
+ 
+o .isCurrentlyPushed: Check if the button is currently pushed.  This function will return true every time you call it if the button is currently pushed.  If you hold down the button and call this function you will see dozens of button pushes. 
+	• 	Use: if (button.isCurrentlyPushed() == true)…; 
+ 
+o .duration: Return how long in milliseconds the button has been pushed. • Use: x = button.duration(); 
+ 
+Notes: 
+1)	wasPushed() returns true if the button is currently pushed but then ignores the button for the next 500 ms. 
+2)	isCurrentlyPushed() returns true if the button is currently pushed and will continue to return as long as the button is pushed (it does debounce the button for 200 ms prior to returning true. 
+ 
+ 
+LED 
+•	Creates a software version of the LED 
+•	Allows you to turn on/off the LED  
+•	The software will initialize the LED pin for you 
+ 
+Usage: 
+ 
+const int ledPin = 3; 
+ 
+Led myLed(ledPin); 	<- creates a software version of an LED 
+ 
+Loop() 
+{ 
+   myLed.on(); 
+} 
+ 
+Things you can do to an LED:
+o Turn it on: led.on() 
+o Turn it off: led.off() 
+ 
+ 
+3) Timer (MSTimer) 
+•	Creates a timer that does not block 
+•	Timer returns true if the time has expired 
+•	Allows you to set the timer 
+ 
+Usage: 
+ 
+Loop() 
+{ 
+   // turn the LED on after 5 seconds  
+   static MSTimer ledTimer(5000); 
+
+   if(ledTimer.done() == true)
+   {
+      ledTimer.set(5000);
+      myLed.on();
+   }
+}
+ 
+Things you can do with the Timer: 
+o	.set(): Set timer for a number of milliseconds: timer.set(1000); 
+   •	.set(1000) sets the time to 1000 milliseconds (so 1-second) 
+   •	Note that setting the timer (timer.set(1000)) only begins the count down.  You need to check the timer with .done() to see when it reaches 0. 
+o	.done(): Check to see if the timer has expired 
+   •	if (timer.done() == true)… 
+ 
+Notes: 
+•	You can initialize the timer to a value when you create the variable: 
+	• 	static MSTimer ledTimer(5000); 
+•	Just setting the timer only begins the count down.  You must check it using an if (ledTimer.done() == true)… to make use of the timer 
+•	Remember to make your timer variable static.  Otherwise you will keep losing your timer every time the function ends. 
+

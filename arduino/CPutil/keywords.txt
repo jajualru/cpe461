@@ -1,0 +1,44 @@
+#######################################
+# Syntax Coloring Map For CPE123 Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Led			KEYWORD1
+Button 		KEYWORD1
+MSTimer 	KEYWORD1
+CPE123_Winter18.h	KEYWORD1
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+done 	KEYWORD2
+set		KEYWORD2
+
+initLed 	KEYWORD2
+on 			KEYWORD2
+off 		KEYWORD2
+blinkOn 	KEYWORD2
+update 		KEYWORD2
+
+wasPushed	KEYWORD2
+duration 	KEYWORD2
+isCurrentlyPushed 	KEYWORD2
+waitOnPush 	KEYWORD2
+
+printLibVersion	KEYWORD2
+setupMessage 	KEYWORD2
+serialPrintf	KEYWORD2
+printVolts		KEYWORD2
+printPair		KEYWORD2
+print2			KEYWORD2
+print3			KEYWORD2
+print4			KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
