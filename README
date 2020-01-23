@@ -1,2 +1,9 @@
 Senior Project by Jacob Rumpf
 
+GitHub repository:
+https://github.com/jajualru/cpe461.git
+
+RasPi ssh setup: https://desertbot.io/blog/ssh-into-pi-zero-over-usb
+ssh-keygen -R raspi0a.local
+ssh pi@raspi0a.local
+
