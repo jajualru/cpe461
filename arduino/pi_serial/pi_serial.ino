@@ -1,5 +1,9 @@
 #include "packets.h" // TODO
 
+#define DEBUG     (true)
+
+uint8_t packetState = ps_default;
+
 void setup() {
   // debug serial
   Serial.begin(115200);
@@ -11,23 +15,46 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
+// loop through main functions
 void loop() {
-  // read incoming data
-  if(Serial1.available()) {
-    uint8_t r = Serial1.read();
-    if(r == p_led_high) {
-      // set LED high
+  serial();
+
+  // TODO: add other functions here
+}
+
+void serial() {
+  // check for incoming data
+  if(!(Serial1.available())) {
+    return;
+  }
+
+  // get data
+  uint8_t val = Serial1.read();
+
+  if(packetState == 0) {
+    // check op code and update state if necessary
+    if(val == pop_led_high) {
       digitalWrite(LED_BUILTIN, HIGH);
-      Serial.println("LED high");
+      printDebug("LED high");
     }
-    else if(r == p_led_low) {
-      // set LED low
+    else if(val == pop_led_low) {
       digitalWrite(LED_BUILTIN, LOW);
-      Serial.println("LED low");
+      printDebug("LED low");
     }
+    // TODO: add other packets here
     else {
-      // else print char to screen
-      Serial.println(r);
+      // unrecognized packet
+      printDebug("Unrecognized packet: ");
+      printDebug(String(val));
     }
+  }
+  else {
+    // TODO: add other states here
+  }
+}
+
+void printDebug(String str) {
+  if(DEBUG) {
+    Serial.println(str);
   }
 }
