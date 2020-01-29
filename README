@@ -7,3 +7,10 @@ RasPi ssh setup: https://desertbot.io/blog/ssh-into-pi-zero-over-usb
 ssh-keygen -R raspi0a.local
 ssh pi@raspi0a.local
 
+RasPi serial setup (TODO: check on fresh pi, may contain more steps)
+ls /dev/tty*
+if ttyS0 is not visible, proceed to enable
+sudo vim /boot/config.txt
+add the following at the end of the file: enable_uart=1
+sudo reboot
+ls
