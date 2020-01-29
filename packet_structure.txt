@@ -16,6 +16,7 @@ distance_poll     0b00100001       (unused)                         (unused)
 serial_write      0b01000000       str_length                       char1...charX (extend packet as necessary)
 LCD_write         0b10000000       TODO                             TODO
 LCD_clear         0b10000001       (unused)                         (unused)
+pin_init          0b11110000       pin#                             pin_function (sensor, digital I/O, etc)
 
 
 Arduino -> RasPi Commands:
