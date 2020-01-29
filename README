@@ -13,4 +13,5 @@ if ttyS0 is not visible, proceed to enable
 sudo vim /boot/config.txt
 add the following at the end of the file: enable_uart=1
 sudo reboot
-ls
+ls /dev/tty*
+check that ttyS0 is now visible
