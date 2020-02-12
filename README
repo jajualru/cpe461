@@ -15,3 +15,9 @@ add the following at the end of the file: enable_uart=1
 sudo reboot
 ls /dev/tty*
 check that ttyS0 is now visible
+
+Ultrasonic Interrupt Pins
+The ultrasonic (distance) sensor only supports special pins on the
+Arduino Mega. These pins are 2, 3, 18, 19, 20, and 21. Some of these
+may already be connected to the RasPi, so plan ahead while wiring!
+
