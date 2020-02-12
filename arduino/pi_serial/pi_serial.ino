@@ -76,8 +76,8 @@ void processSerial() {
         // check pin is unused
         if(pins[p_data[1]].state != PIN_S_UNUSED) {
           // return error message
-          uint8_t err_code = ERR_INVALID_PIN;
-          sendPacket(POP_ERROR, &err_code, 1);
+          uint8_t err_code[2] = {ERR_INVALID_PIN, p_data[1]};
+          sendPacket(POP_ERROR, err_code, 2);
           printDebug("Failed to initialize pin");
           
           p_len = 0;
@@ -100,8 +100,8 @@ void processSerial() {
         // check for valid pin
         if(pins[p_data[1]].state != INPUT) {
           // return error message
-          uint8_t err_code = ERR_INVALID_PIN;
-          sendPacket(POP_ERROR, &err_code, 1);
+          uint8_t err_code[2] = {ERR_INVALID_PIN, p_data[1]};
+          sendPacket(POP_ERROR, err_code, 2);
           printDebug("Failed to initialize pin");
           
           p_len = 0;
