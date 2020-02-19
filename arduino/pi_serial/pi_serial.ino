@@ -37,7 +37,7 @@ void setupPins() {
 
 // process serial packets until no more are available
 void processSerial() {
-  static uint8_t p_data[PACKET_MAX_SIZE];
+  static uint8_t p_data[PACKET_MAX_SIZE]; //Todo: rename to packetData
   static uint8_t p_len = 0;
   
   // process data until none available
@@ -46,12 +46,12 @@ void processSerial() {
     p_data[p_len] = Serial1.read();
     p_len++;
     
-    // skip switch if start of new packet
+    // report new packet
     if(p_len == 1) {
       printDebug("New op code: " + String(p_data[0]));
-      continue;
     }
 
+  // TODO: refactor each medium/long case into its own function
     switch(p_data[0]) {
       case POP_LED_HIGH:
         digitalWrite(LED_BUILTIN, HIGH);
@@ -96,6 +96,8 @@ void processSerial() {
         if(p_len < 2) {
           break;
         }
+
+        // TODO: save pin # to variable
         
         // check for valid pin
         if(pins[p_data[1]].state != INPUT) {
