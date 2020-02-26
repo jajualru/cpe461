@@ -15,9 +15,10 @@ distance_start    0b00100000       (unused)                         (unused)
 distance_poll     0b00100001       (unused)                         (unused)
 serial_write      0b01000000       str_length                       char1...charX (extend packet as necessary)
 LCD_write         0b10000000       TODO                             TODO
-LCD_clear         0b10000001       (unused)                         (unused)
-pin_init          0b11110000       pin#                             pin_function (sensor, digital I/O, etc)
-reset             0b11000000
+LCD_clear         0b10000001 (129) (unused)                         (unused)
+pin_init          0b11110000 (240) pin#                             pin_function (sensor, digital I/O, etc)
+reset             0b11000000 (192)
+ping              0b00011000 (24)  (unused)
 
 
 Arduino -> RasPi Commands:
@@ -27,9 +28,10 @@ digital_data      0b11101111       pin#                              value
 distance_wait     0b11011110       (unused)                         (unused)
 distance_data     0b11011111       data part 1                      data part 2
 error             0b11111111       value
+pin_ack           0b00001111
 
 
 Error Codes:
-invalid_pin       0b00000001
+invalid_pin       0b00000001       pin#
 invalid_packet    0b00000010
 

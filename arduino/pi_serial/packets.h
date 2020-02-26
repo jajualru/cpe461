@@ -11,6 +11,8 @@
 #define POP_LED_HIGH        (0b01010101)
 #define POP_LED_LOW         (0b10101010)
 #define POP_PIN_INIT        (0b11110000)
+#define POP_PIN_ACK         (0b00001111)
+#define POP_PING            (0b00011000)
 
 // error codes
 #define ERR_INVALID_PACKET  (0b00000010)

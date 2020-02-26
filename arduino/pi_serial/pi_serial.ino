@@ -67,6 +67,12 @@ void processSerial() {
         p_len = 0; // end of packet
         break;
 
+      case POP_PING:
+        // respond to ping
+        sendPacket(POP_PING, NULL, 0);
+        printDebug("Responded to ping");
+        break;
+
       case POP_PIN_INIT:
         // skip processing if incomplete packet
         if(p_len < 3) {
@@ -87,6 +93,9 @@ void processSerial() {
         // initialize pin
         pins[p_data[1]].state = p_data[2];
         pinMode(p_data[1], p_data[2]);
+
+        // send ack
+        sendPacket(POP_PIN_ACK, NULL, 0);
         
         p_len = 0; // end of packet
         break;
