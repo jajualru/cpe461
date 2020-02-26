@@ -1,7 +1,7 @@
 import array
 import serial
 import time
-import packets
+import packets # TODO: import directly to remove unnecessary references
 import struct
 from mega import Mega
 
@@ -19,6 +19,12 @@ class MegaSerial:
     # byte array for reading packets
     packet = bytearray(packets.MAX_PACKET_LENGTH)
     packetLength = 0
+
+    # ping response tracker
+    pingResponse = False
+
+    # pin initialization check
+    pinInitSafe = None
 
     # connects to arduino
     def setupConnection(self):
@@ -41,7 +47,7 @@ class MegaSerial:
             # switch on packet type
             if self.packet[0] == packets.PACKET["ERROR"]:
                 self.processError()
-                continue
+                continue # TODO: is this continue necessary?
 
             elif self.packet[0] == packets.PACKET["DIGITAL_DATA"]:
                 # TODO: refactor to separate function
@@ -56,6 +62,20 @@ class MegaSerial:
                 # reset after complete packet
                 self.packetLength = 0
 
+            elif self.packet[0] == packets.PACKET["PING"]:
+                # mark ping response as received
+                self.pingResponse = True
+
+                # reset after complete packet
+                self.packetLength = 0
+
+            elif self.packet[0] == packets.PACKET["PIN_ACK"]:
+                # update pin initialization state
+                self.pinInitSafe = True
+
+                # reset after complete packet
+                self.packetLength = 0
+               
             # TODO: add other packet types here
 
             else:
@@ -72,10 +92,15 @@ class MegaSerial:
         elif self.packetLength == 2:
             if self.packet[1] == packets.ERROR["INVALID_PACKET"]:
                 print("Error: Arduino did not recognize packet")
-            elif self.packet[1] == packets.ERROR["INVALID_PIN"]:
-                print("Error: Invalid pin")
-            # reset after complete packet
-            self.packetLength = 0
+                # reset after complete packet
+                self.packetLength = 0
+        # check errors of length 3
+        elif self.packetLength == 3:
+            if self.packet[1] == packets.ERROR["INVALID_PIN"]:
+                print("Error: Invalid pin " + str(self.packet[2]))
+                self.pinInitSafe = False
+                # reset after complete packet
+                self.packetLength = 0
 
         # TODO: add other errors here
         
@@ -91,12 +116,53 @@ class MegaSerial:
 
     # sets up a pin for digital reading
     def setPinDigitalRead(self, pin):
+        # reset pin init state
+        self.pinInitSafe = None
+
         # send request to Mega
         data = bytearray()
         data.append(pin)
         data.append(0)
         self.sendPacket(packets.PACKET["PIN_INIT"], data)
 
+        # wait for ack or error
+        while(self.pinInitSafe is None):
+            self.processSerial()
+
+        # check for error
+        if not self.pinInitSafe:
+            exit()
+
         # update local Mega
         self.localMega.initializePin(pin, 0)
+
+    # sends a ping to the Arduino and returns the response time in decimal seconds or -1 on error
+    def ping(self):
+        # check if connection has been set up
+        if self.ser is None:
+            print("Error: Serial connection not initialized")
+            return
+
+        # reset ping tracker and start timer
+        self.pingResponse = False
+        start = time.time()
+        end = time.time()
+
+        # send ping
+        self.sendPacket(packets.PACKET["PING"], None)
+
+        # block until response or 1 second elapsed
+        while((not self.pingResponse) and (end < start + 1)):
+            # block until data available for more precise timing
+            while(self.ser.in_waiting == 0):
+               None
+            self.processSerial()
+            end = time.time()
+
+        # check for timeout
+        if end >= start + 1:
+            return -1
+
+        # return elapsed time
+        return end - start
 

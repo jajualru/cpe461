@@ -7,7 +7,9 @@ PACKET = {
         "ERROR":                255,
         "LED_LOW":              170,
         "LED_HIGH":             85,
-        "PIN_INIT":             240 
+        "PIN_INIT":             240,
+        "PIN_ACK":              15,
+        "PING":                 24
 }
 
 # error codes
