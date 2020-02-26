@@ -9,7 +9,9 @@ PACKET = {
         "LED_HIGH":             85,
         "PIN_INIT":             240,
         "PIN_ACK":              15,
-        "PING":                 24
+        "PING":                 24,
+        "RESET":                192,
+        "STARTUP":              193
 }
 
 # error codes

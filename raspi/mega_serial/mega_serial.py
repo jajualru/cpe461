@@ -14,7 +14,7 @@ class MegaSerial:
     ser = None
 
     # virtual Mega tracking object
-    localMega = Mega()
+    localMega = None
 
     # byte array for reading packets
     packet = bytearray(packets.MAX_PACKET_LENGTH)
@@ -29,7 +29,19 @@ class MegaSerial:
     # connects to arduino
     def setupConnection(self):
         self.ser=serial.Serial("/dev/ttyS0", self.BAUD_RATE)
+        time.sleep(0.3) # wait to be safe
+
+        # reset mega
+        self.sendPacket(packets.PACKET["RESET"], None)
         time.sleep(1) # wait to be safe
+
+        # wait for startup ack
+        watchdog = time.time() + 3
+        while(self.localMega is not None):
+            if time.time() > watchdog:
+                print("Error: Connection timeout")
+                exit()
+        time.sleep(0.3) # wait to be safe
 
     # processes all available serial data
     def processSerial(self):
@@ -72,6 +84,18 @@ class MegaSerial:
             elif self.packet[0] == packets.PACKET["PIN_ACK"]:
                 # update pin initialization state
                 self.pinInitSafe = True
+
+                # reset after complete packet
+                self.packetLength = 0
+
+            elif self.packet[0] == packets.PACKET["STARTUP"]:
+                # check if mega is already initialized
+                if self.localMega is not None:
+                    print("Error: Mega reset")
+                    exit()
+
+                # initialize local mega
+                self.localMega = Mega()
 
                 # reset after complete packet
                 self.packetLength = 0
