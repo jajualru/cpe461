@@ -13,6 +13,8 @@
 #define POP_PIN_INIT        (0b11110000)
 #define POP_PIN_ACK         (0b00001111)
 #define POP_PING            (0b00011000)
+#define POP_RESET           (0b11000000)
+#define POP_STARTUP         (0b11000001)
 
 // error codes
 #define ERR_INVALID_PACKET  (0b00000010)

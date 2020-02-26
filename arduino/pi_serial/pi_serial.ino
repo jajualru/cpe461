@@ -1,3 +1,4 @@
+#include <avr/wdt.h>
 #include "packets.h"
 #include "pins.h"
 
@@ -9,6 +10,7 @@ struct Pin pins[NUM_PINS];
 void setup() {
   // debug serial
   Serial.begin(115200);
+  printDebug("Booting up");
 
   // raspi serial (TX1 and RX1 pins)
   Serial1.begin(9600);
@@ -18,6 +20,9 @@ void setup() {
 
   // initialize pin structure
   setupPins();
+
+  // send startup packet
+  sendPacket(POP_STARTUP, NULL, 0);
 }
 
 // loop through main functions
@@ -71,6 +76,8 @@ void processSerial() {
         // respond to ping
         sendPacket(POP_PING, NULL, 0);
         printDebug("Responded to ping");
+
+        p_len = 0;
         break;
 
       case POP_PIN_INIT:
@@ -106,7 +113,7 @@ void processSerial() {
           break;
         }
 
-        // TODO: save pin # to variable
+        // TODO: save pin # to variable for readability
         
         // check for valid pin
         if(pins[p_data[1]].state != INPUT) {
@@ -127,6 +134,11 @@ void processSerial() {
 
         p_len = 0; // end of packet
         break;
+
+      case POP_RESET:
+        printDebug("Received reset");
+        delay(100); // delay to allow debug print
+        reboot();
       
       // TODO: add other packet types here
       
@@ -152,4 +164,11 @@ static inline void printDebug(String str) {
   if(DEBUG) {
     Serial.println(str);
   }
+}
+
+// software reboots the Arduino
+void reboot() {
+  wdt_disable();
+  wdt_enable(WDTO_15MS);
+  while(1);
 }
