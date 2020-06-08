@@ -1,6 +1,6 @@
 import time
 from packets import PACKET
-from mega_serial import MegaSerial
+from mega_spi import MegaSpi
 from mega import Mega
 
 # sets up a connection and sends some commands
@@ -8,7 +8,7 @@ from mega import Mega
 # - sends requests to pin 8 and monitors when data is available
 def main():
     # create objects
-    mega = MegaSerial()
+    mega = MegaSpi()
 
     # initialize connection to Arduino
     mega.setupConnection()
@@ -17,7 +17,7 @@ def main():
         # send a ping and print the result
         pingTime = mega.ping()
         print("Ping time: " + str(pingTime))
-        time.sleep(0.5)
+        time.sleep(1)
 
 if __name__ == "__main__":
    main()

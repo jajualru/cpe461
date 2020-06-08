@@ -11,7 +11,8 @@ PACKET = {
         "PIN_ACK":              15,
         "PING":                 24,
         "RESET":                192,
-        "STARTUP":              193
+        "STARTUP":              193,
+        "REQUEST":              23
 }
 
 # error codes
