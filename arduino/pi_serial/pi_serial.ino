@@ -13,7 +13,7 @@ void setup() {
   printDebug("Booting up");
 
   // raspi serial (TX1 and RX1 pins)
-  Serial1.begin(9600);
+  Serial1.begin(19200);
 
   // initialize builtin LED
   pinMode(LED_BUILTIN, OUTPUT);
