@@ -1,4 +1,4 @@
-MAX_PACKET_LENGTH = 100 # TODO: update if necessary
+MAX_PACKET_LENGTH = 100 # TODO: update as necessary
 
 # packet types
 PACKET = {

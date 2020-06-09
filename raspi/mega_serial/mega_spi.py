@@ -1,7 +1,7 @@
 import array
 import serial
 import time
-import packets # TODO: import directly to remove unnecessary references
+import packets
 import struct
 import spidev
 import RPi.GPIO as GPIO
@@ -11,10 +11,6 @@ from mega import Mega
 class MegaSpi:
     # constants
     BAUD_RATE = 19200
-
-    # TODO: remove
-    # serial object
-    # ser = None
 
     # spi connection object
     spi = None
@@ -37,32 +33,19 @@ class MegaSpi:
 
     # connects to arduino
     def setupConnection(self):
-        # TODO: replace with spi
-        # self.ser=serial.Serial("/dev/serial1", self.BAUD_RATE)
-        # TODO: connect over spi
         self.spi = spidev.SpiDev()
-        self.spi.open(0,0) # TODO: may need to be 1 instead (only 0 or 1)
-        self.spi.max_speed_hz = 100000 # TODO: increase to 1000000?
+        self.spi.open(0,0)
+        self.spi.max_speed_hz = 100000
         time.sleep(0.3) # wait to be safe
 
-        # TODO: set up SEND_EN pin for receiving data
+        # set up SEND_EN pin for receiving data
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(25, GPIO.IN)
 
         # reset mega
         self.sendPacket(packets.PACKET["RESET"], None)
-        time.sleep(1) # wait to be safe
+        time.sleep(1.5) # wait to allow bootup
 
-        # TODO: fix bootup sequence to wait for restart and retry restart
-        # wait for startup ack
-        watchdog = time.time() + 3
-        while(self.localMega is not None):
-            if time.time() > watchdog:
-                print("Error: Connection timeout")
-                exit()
-        time.sleep(0.3) # wait to be safe
-
-    # TODO: requests data from mega
     def requestData(self):
         self.sendPacket(packets.PACKET["REQUEST"], None)
 
@@ -72,19 +55,11 @@ class MegaSpi:
         
         # read data size
         dataSize = self.spi.readbytes(1)[0]
-        #print("Data size = " + str(dataSize)) # TODO: remove
 
-        # TODO: try replacing with one read operation
         # loop transfer for data size
         for i in range(dataSize):
-            #time.sleep(0.005) # TODO: remove?
             rx = self.spi.readbytes(1)[0]
             self.rxData.append(rx)
-            #time.sleep(0.005) # TODO: remove?
-            #print("Received " + str(rx)) # TODO: remove debug print
-
-        # TODO: remove debug
-        #print(self.rxData)
 
     # processes all available serial data
     def processSerial(self):
@@ -93,15 +68,13 @@ class MegaSpi:
             print("Error: SPI connection not initialized")
             return
 
-        # TODO: poll SEND_EN for incoming data
+        # poll SEND_EN for incoming data
         if(GPIO.input(25)):
             self.requestData()
 
-        # TODO: convert to spi
         # read data as long as it is available
         while len(self.rxData) > 0:
             # read next byte
-            # self.packet[self.packetLength] = ord(self.ser.read(1))
             self.packet[self.packetLength] = self.rxData[0]
             self.packetLength += 1
             self.rxData.pop(0)
@@ -109,54 +82,61 @@ class MegaSpi:
             # switch on packet type
             if self.packet[0] == packets.PACKET["ERROR"]:
                 self.processError()
-                continue # TODO: is this continue necessary?
 
             elif self.packet[0] == packets.PACKET["DIGITAL_DATA"]:
-                # TODO: refactor to separate function
                 if self.packetLength < 3:
                     continue
-                # TODO: remove debug print
-                # print data
-                print("Pin " + str(self.packet[1]) + ": " + str(self.packet[2]))
-
-                # update pin structure
-                self.localMega.setPinData(self.packet[1], self.packet[2])
-
-                # reset after complete packet
-                self.packetLength = 0
+                
+                self.processDigitalData()
 
             elif self.packet[0] == packets.PACKET["PING"]:
-                # mark ping response as received
-                self.pingResponse = True
-
-                # reset after complete packet
-                self.packetLength = 0
+                self.processPing()
 
             elif self.packet[0] == packets.PACKET["PIN_ACK"]:
-                # update pin initialization state
-                self.pinInitSafe = True
-
-                # reset after complete packet
-                self.packetLength = 0
+                self.processPinAck()
 
             elif self.packet[0] == packets.PACKET["STARTUP"]:
-                # check if mega is already initialized
-                if self.localMega is not None:
-                    print("Error: Mega reset")
-                    exit()
-
-                # initialize local mega
-                self.localMega = Mega()
-
-                # reset after complete packet
-                self.packetLength = 0
+                self.processStartup()
                
             # TODO: add other packet types here
 
             else:
                 # report bad packet and throw out data
-                print("Error: Unrecognized op code")
+                print("Error: Unrecognized op code " + str(self.packet[0]))
                 self.packetLength = 0
+
+    def processDigitalData(self):
+        # update pin structure
+        self.localMega.setPinData(self.packet[1], self.packet[2])
+
+        # reset after complete packet
+        self.packetLength = 0
+
+    def processPing(self):
+        # mark ping response as received
+        self.pingResponse = True
+
+        # reset after complete packet
+        self.packetLength = 0
+
+    def processPinAck(self):
+        # update pin initialization state
+        self.pinInitSafe = True
+
+        # reset after complete packet
+        self.packetLength = 0
+
+    def processStartup(self):
+        # check if mega is already initialized
+        if self.localMega is not None:
+            print("Error: Mega reset")
+            exit()
+
+        # initialize local mega
+        self.localMega = Mega()
+
+        # reset after complete packet
+        self.packetLength = 0
 
     # reports an error
     def processError(self):
@@ -185,16 +165,10 @@ class MegaSpi:
 
     # sends a packet to the Arduino
     def sendPacket(self, opCode, msg):
-        # TODO: remove
-        # self.ser.write(struct.pack('B', opCode))
-        #time.sleep(0.1) # TODO: remove or fine tune
         self.spi.writebytes([opCode])
         if not msg is None:
-            # TODO: remove
-            # self.ser.write(msg)
-            self.spi.xfer(msg) # TODO: debug for messages with contents
+            self.spi.xfer(msg)
 
-    # TODO
     # checks for incoming data before sending a packet to the Arduino
     def safeSendPacket(self, opCode, msg):
         # check for incoming data to avoid overwriting messages

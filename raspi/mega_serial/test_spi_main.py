@@ -39,8 +39,15 @@ def main():
 
         # read pin status
         #print("C " + str(mega.localMega.getPinState(8)))
+        
+        # wait until data is ready
+        while(mega.localMega.getPinState(8) != "ready"):
+            mega.processSerial()
 
-        #time.sleep(0.01)
+        # read data
+        print("Pin 8: " + str(mega.localMega.getPinData(8)))
+
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     main()
