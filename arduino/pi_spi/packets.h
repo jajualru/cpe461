@@ -1,8 +1,8 @@
 #ifndef PACKETS_H
 #define PACKETS_H
 
-// TODO: update to match largest packet size
-#define PACKET_MAX_SIZE     (8)
+// TODO: update to match largest packet size as necessary
+#define PACKET_MAX_SIZE     (100)
 
 // op codes
 #define POP_DIGITAL_DATA    (0b11101111)

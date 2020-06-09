@@ -30,13 +30,21 @@ void loop() {
   processSerial();
 
   // TODO: add other functions here
+  //    - motor control
+  //    - long-read sensor data
+  //    - LCD communication
 }
 
 // initialize pin structure
 void setupPins() {
   for(int i = 0; i < NUM_PINS; i++) {
-    // TODO: fill in default used pins
-    pins[i].state = PIN_S_UNUSED;
+    if(i >= 49) {
+      // pins used for communication
+      pins[i].state = PIN_S_LOCKED;
+    }
+    else {
+      pins[i].state = PIN_S_UNUSED;
+    }
   }
 }
 
